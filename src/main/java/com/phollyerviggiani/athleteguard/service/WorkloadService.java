@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+
+// service class for calculating and storing workload summaries for athletes, including methods to calculate
+// acute and chronic workloads based on training sessions and evaluate injury risk using the InjuryRiskService
 @Service
 public class WorkloadService {
 

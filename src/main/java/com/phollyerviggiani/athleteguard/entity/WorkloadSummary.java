@@ -7,6 +7,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "workload_summary")
+
+// entity class representing a workload summary for an athlete
+// this class will be used to store workload summary information in the database and will be linked to
+// the athlete table through a many-to-one relationship and to the injury risk flag table through a one-to-many relationship
 public class WorkloadSummary {
 
     @Id

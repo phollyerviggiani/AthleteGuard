@@ -5,6 +5,7 @@ import com.phollyerviggiani.athleteguard.entity.WorkloadSummary;
 import com.phollyerviggiani.athleteguard.repository.InjuryRiskFlagRepository;
 import org.springframework.stereotype.Service;
 
+// service class for evaluating injury risk based on workload summaries, determining risk levels, and saving injury risk flags to the database
 @Service
 public class InjuryRiskService {
 

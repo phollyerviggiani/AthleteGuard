@@ -5,6 +5,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+
+// entity class representing a user of the application
+// this class will be used to store user information in the database and will be linked to the
+// athlete table through a one-to-one relationship
 public class Users {
 
     @Id

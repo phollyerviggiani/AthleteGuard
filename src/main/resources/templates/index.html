@@ -1,10 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
     <title>AthleteGuard</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-    <h1>AthleteGuard is running!!</h1>
+
+<div class="navbar">
+    <h2>AthleteGuard</h2>
+    <a th:href="@{/athletes}">Athletes</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h1>Welcome to AthleteGuard</h1>
+        <p>
+            Athlete performance tracking and injury risk monitoring system.
+        </p>
+        <a th:href="@{/athletes}">
+            <button>View Athletes</button>
+        </a>
+    </div>
+</div>
+
 </body>
 </html>

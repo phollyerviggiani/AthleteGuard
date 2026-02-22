@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Oops! Error</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+  <style>
+    .error-container { text-align: center; margin-top: 100px; }
+    .error-code { font-size: 3rem; color: #991b1b; }
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  <h2>AthleteGuard</h2>
+</div>
+
+<div class="container error-container">
+  <div class="card">
+    <h1 class="error-code">Something went wrong!</h1>
+    <p>We're sorry, but an unexpected error has occurred on our end.</p>
+
+    <p>Try again later.</p>
+
+    <br>
+    <a th:href="@{/athletes}">
+      <button>Return to Dashboard</button>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

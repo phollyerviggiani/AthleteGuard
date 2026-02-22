@@ -7,6 +7,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "athlete")
+
+// entity class representing an athlete
+// this class will be used to store athlete information
+// in the database and will be linked to the users table through a one-to-one relationship
 public class Athlete {
 
     @Id
@@ -47,8 +51,7 @@ public class Athlete {
 
     public Athlete() {}
 
-    // Getters and setters omitted for brevity
-
+    // Getters and setters for athlete
     public Integer getAthleteId() {
         return athleteId;
     }

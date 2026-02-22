@@ -5,6 +5,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "injury_risk_flag")
+
+// entity class representing an injury risk flag for an athlete
+// this class will be used to store injury risk flags in the database and will be linked to
+// the athlete and workload summary tables through many-to-one relationships
 public class InjuryRiskFlag {
 
     @Id

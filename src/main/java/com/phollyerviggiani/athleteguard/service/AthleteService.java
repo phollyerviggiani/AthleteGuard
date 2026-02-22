@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+// service class for managing Athlete entities, providing methods to retrieve all athletes and get an athlete by ID
 @Service
 public class AthleteService {
 

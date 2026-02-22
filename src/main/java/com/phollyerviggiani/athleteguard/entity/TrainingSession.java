@@ -5,6 +5,10 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "training_session")
+
+// entity class representing a training session for an athlete
+// this class will be used to store training session information in the database and will be linked to
+// the athlete table through a many-to-one relationship
 public class TrainingSession {
 
     @Id

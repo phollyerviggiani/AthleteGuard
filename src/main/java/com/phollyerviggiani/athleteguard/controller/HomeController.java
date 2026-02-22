@@ -3,6 +3,7 @@ package com.phollyerviggiani.athleteguard.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+// home controller which returns the home page
 @Controller
 public class HomeController {
 

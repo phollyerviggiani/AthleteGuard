@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Athlete Details</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div class="navbar">
+  <h2>AthleteGuard</h2>
+  <a th:href="@{/athletes}">Athletes</a>
+</div>
+
+<div class="container">
+
+  <h1 th:text="${athlete.firstName + ' ' + athlete.lastName}"></h1>
+
+  <div class="card">
+    <p><strong>Sport:</strong> <span th:text="${athlete.sport}"></span></p>
+    <p><strong>Position:</strong> <span th:text="${athlete.position}"></span></p>
+  </div>
+
+  <div class="card">
+    <h3>Latest Workload Summary</h3>
+
+    <div th:if="${summary != null}">
+      <p><strong>Acute:</strong> <span th:text="${summary.acuteWorkload}"></span></p>
+      <p><strong>Chronic:</strong> <span th:text="${summary.chronicWorkload}"></span></p>
+      <p><strong>ACWR:</strong> <span th:text="${summary.acwr}"></span></p>
+    </div>
+
+    <div th:if="${summary == null}">
+      <p>No workload data available.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Current Injury Risk</h3>
+
+    <div th:if="${risk != null}">
+            <span class="badge"
+                  th:classappend="${risk.riskLevel == 'HIGH'} ? ' badge-high' : (${risk.riskLevel == 'MODERATE'} ? ' badge-moderate' : (${risk.riskLevel == 'UNDERLOAD'} ? ' badge-underload' : ' badge-low'))"
+                  th:text="${risk.riskLevel}">
+            </span>
+
+      <p th:text="${risk.reason}"></p>
+    </div>
+
+    <div th:if="${risk == null}">
+      <p>No risk flags generated yet.</p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

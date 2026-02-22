@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+// service class for managing TrainingSession entities, providing methods to retrieve sessions for a specific athlete and add new training sessions
+// when a new session is added, it also triggers a recalculation of the athlete's workload using the WorkloadService
 @Service
 public class TrainingSessionService {
 
