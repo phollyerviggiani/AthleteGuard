@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+
 // dealing with going to /athletes and /athletes/{id} and showing the appropriate data on the page
 @Controller
 public class AthleteController {
@@ -38,6 +39,7 @@ public class AthleteController {
 
         return "athletes";
     }
+
 
     // going to specific athlete page, showing all athlete details
     @GetMapping("/athletes/{id}")
@@ -65,4 +67,6 @@ public class AthleteController {
 
         return "athlete-detail";
     }
+
+
 }

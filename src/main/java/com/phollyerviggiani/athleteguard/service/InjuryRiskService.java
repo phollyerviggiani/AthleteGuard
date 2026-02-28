@@ -5,6 +5,8 @@ import com.phollyerviggiani.athleteguard.entity.WorkloadSummary;
 import com.phollyerviggiani.athleteguard.repository.InjuryRiskFlagRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 // service class for evaluating injury risk based on workload summaries, determining risk levels, and saving injury risk flags to the database
 @Service
 public class InjuryRiskService {
@@ -41,6 +43,7 @@ public class InjuryRiskService {
         flag.setWorkloadSummary(summary);
         flag.setRiskLevel(riskLevel);
         flag.setReason(reason);
+        flag.setGeneratedAt(LocalDateTime.now());
 
         injuryRiskFlagRepository.save(flag);
     }

@@ -16,6 +16,10 @@
 
   <h1 th:text="${athlete.firstName + ' ' + athlete.lastName}"></h1>
 
+  <a class="button" th:href="@{'/athletes/' + ${athlete.athleteId} + '/sessions/new'}">
+    Add Training Session
+  </a>
+
   <div class="card">
     <p><strong>Sport:</strong> <span th:text="${athlete.sport}"></span></p>
     <p><strong>Position:</strong> <span th:text="${athlete.position}"></span></p>

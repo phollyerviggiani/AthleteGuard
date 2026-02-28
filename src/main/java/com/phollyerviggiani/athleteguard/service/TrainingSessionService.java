@@ -25,6 +25,7 @@ public class TrainingSessionService {
         return trainingSessionRepository.findByAthlete_AthleteId(athleteId);
     }
 
+
     @Transactional
     public TrainingSession addSession(TrainingSession session) {
 
