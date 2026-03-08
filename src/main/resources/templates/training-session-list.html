@@ -1,10 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <title>Training Sessions</title>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
+
+<div class="navbar">
+    <h2>AthleteGuard</h2>
+    <a th:href="@{/athletes}">All Athletes</a>
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h2>
+            Training Sessions –
+            <span th:text="${athlete.firstName + ' ' + athlete.lastName}"></span>
+        </h2>
+
+        <div class="actions">
+            <a class="btn-primary"
+               th:href="@{'/athletes/' + ${athlete.athleteId} + '/sessions/new'}">
+                Add Training Session
+            </a>
+            <br>
+            <br>
+            <a class="btn-secondary"
+               th:href="@{'/athletes/' + ${athlete.athleteId}}">
+                Back to Athlete
+            </a>
+        </div>
+    </div>
+
+    <div class="card" th:if="${#lists.isEmpty(sessions)}">
+        <p>No training sessions recorded yet.</p>
+    </div>
+
+    <div class="card" th:if="${!#lists.isEmpty(sessions)}">
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Duration (min)</th>
+                <th>Intensity</th>
+                <th>Load</th>
+                <th>Notes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ts : ${sessions}">
+                <td th:text="${ts.sessionDate}"></td>
+                <td th:text="${ts.sessionType}"></td>
+                <td th:text="${ts.durationMinutes}"></td>
+                <td th:text="${ts.intensity}"></td>
+                <td th:text="${ts.durationMinutes * ts.intensity}"></td>
+                <td th:text="${ts.notes}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
 
 </body>
 </html>

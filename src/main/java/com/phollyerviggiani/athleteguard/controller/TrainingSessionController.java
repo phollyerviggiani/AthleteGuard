@@ -24,6 +24,21 @@ public class TrainingSessionController {
         this.trainingSessionService = trainingSessionService;
     }
 
+    @GetMapping
+    public String listSessions(@PathVariable Integer athleteId, Model model) {
+
+        Athlete athlete = athleteService.getAthleteById(athleteId)
+                .orElseThrow(() -> new RuntimeException("Athlete not found"));
+
+        List<TrainingSession> sessions =
+                trainingSessionService.getSessionsForAthlete(athleteId);
+
+        model.addAttribute("athlete", athlete);
+        model.addAttribute("sessions", sessions);
+
+        return "training-session-list";
+    }
+
     // Show form
     @GetMapping("/new")
     public String showSessionForm(@PathVariable Integer athleteId, Model model) {
@@ -40,20 +55,7 @@ public class TrainingSessionController {
         return "training-session-form";
     }
 
-    @GetMapping
-    public String listSessions(@PathVariable Integer athleteId, Model model) {
 
-        Athlete athlete = athleteService.getAthleteById(athleteId)
-                .orElseThrow(() -> new RuntimeException("Athlete not found"));
-
-        List<TrainingSession> sessions =
-                trainingSessionService.getSessionsForAthlete(athleteId);
-
-        model.addAttribute("athlete", athlete);
-        model.addAttribute("sessions", sessions);
-
-        return "training-session-list";
-    }
 
     // Handle submission
     @PostMapping
