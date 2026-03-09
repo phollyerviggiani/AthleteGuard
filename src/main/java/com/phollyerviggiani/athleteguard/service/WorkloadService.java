@@ -42,23 +42,36 @@ public class WorkloadService {
 
         double acuteTotal = 0;
         double chronicTotal = 0;
+        int recentSessionCount = 0;
+        LocalDate mostRecentSession = null;
 
         for (TrainingSession s : sessions) {
 
-            double sessionLoad = s.getDurationMinutes() * s.getIntensity();
+            if (mostRecentSession == null || s.getSessionDate().isAfter(mostRecentSession)) {
+                mostRecentSession = s.getSessionDate();
+            }
 
+            double sessionLoad = s.getDurationMinutes() * s.getIntensity();
             if (!s.getSessionDate().isBefore(acuteStart)) {
                 acuteTotal += sessionLoad;
             }
-
             if (!s.getSessionDate().isBefore(chronicStart)) {
                 chronicTotal += sessionLoad;
+                recentSessionCount++;
             }
+        }
+
+        if (mostRecentSession == null || mostRecentSession.isBefore(today.minusDays(60))) {
+            return;
+        }
+
+        if (recentSessionCount < 3) {
+            return;
         }
 
         double acute = acuteTotal / 7.0;
         double chronic = chronicTotal / 28.0;
-        double acwr = chronic > 0 ? acute / chronic : 0;
+        double acwr = chronic > 0.1 ? acute / chronic : 0;
 
         WorkloadSummary summary = new WorkloadSummary();
         summary.setAthlete(athlete);

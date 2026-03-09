@@ -21,8 +21,7 @@
            th:href="@{'/athletes/' + ${athlete.athleteId} + '/sessions/new'}">
             Add Training Session
         </a>
-        <br>
-        <br>
+
         <a class="btn-secondary"
            th:href="@{'/athletes/' + ${athlete.athleteId} + '/sessions'}">
             View Training Sessions
@@ -37,15 +36,16 @@
     <div class="card">
         <h3>Latest Workload Summary</h3>
 
-        <div th:if="${summary != null}">
-            <p><strong>Acute:</strong> <span th:text="${summary.acuteWorkload}"></span></p>
-            <p><strong>Chronic:</strong> <span th:text="${summary.chronicWorkload}"></span></p>
-            <p><strong>ACWR:</strong> <span th:text="${summary.acwr}"></span></p>
+        <div th:if="${summary == null or summary.periodEndDate.isBefore(T(java.time.LocalDate).now().minusDays(28))}">
+            <p>Log at least 3 training sessions in the last 28 days to generate workload metrics.</p>
         </div>
 
-        <div th:if="${summary == null}">
-            <p>No workload data available.</p>
+        <div th:if="${summary != null and summary.periodEndDate.isAfter(T(java.time.LocalDate).now().minusDays(28))}">
+            <p><strong>Acute:</strong> <span th:text="${#numbers.formatDecimal(summary.acuteWorkload, 1, 1)}"></span></p>
+            <p><strong>Chronic:</strong> <span th:text="${#numbers.formatDecimal(summary.chronicWorkload, 1, 1)}"></span></p>
+            <p><strong>ACWR:</strong> <span th:text="${#numbers.formatDecimal(summary.acwr, 1, 1)}"></span></p>
         </div>
+
     </div>
 
     <div class="card">
