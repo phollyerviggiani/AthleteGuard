@@ -2,6 +2,12 @@ package com.phollyerviggiani.athleteguard.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.PastOrPresent;
 
 @Entity
 @Table(name = "training_session")
@@ -20,18 +26,28 @@ public class TrainingSession {
     @JoinColumn(name = "athlete_id", referencedColumnName = "athlete_id")
     private Athlete athlete;
 
+    @PastOrPresent(message = "Session date cannot be in the future")
+    @NotNull
     @Column(name = "session_date", nullable = false)
     private LocalDate sessionDate;
 
+    @NotNull
+    @Min(1)
+    @Max(300)
     @Column(name = "duration_minutes", nullable = false)
     private Integer durationMinutes;
 
+    @NotNull
+    @Min(value = 1, message = "Intensity must be at least 1")
+    @Max(value = 10, message = "Intensity cannot be more than 10")
     @Column(name = "intensity", nullable = false)
     private Integer intensity;
 
+    @NotBlank
     @Column(name = "session_type", nullable = false)
     private String sessionType;
 
+    @Size(max = 100)
     @Column(name = "notes")
     private String notes;
 

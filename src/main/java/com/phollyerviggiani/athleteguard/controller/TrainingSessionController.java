@@ -7,6 +7,8 @@ import com.phollyerviggiani.athleteguard.service.TrainingSessionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,10 +62,17 @@ public class TrainingSessionController {
     // Handle submission
     @PostMapping
     public String addSession(@PathVariable Integer athleteId,
-                             @ModelAttribute TrainingSession trainingSession) {
+                             @Valid @ModelAttribute TrainingSession trainingSession,
+                             BindingResult result,
+                             Model model) {
 
         Athlete athlete = athleteService.getAthleteById(athleteId)
                 .orElseThrow(() -> new RuntimeException("Athlete not found"));
+
+        if (result.hasErrors()) {
+            model.addAttribute("athlete", athlete);
+            return "training-session-form";
+        }
 
         trainingSession.setAthlete(athlete);
 
