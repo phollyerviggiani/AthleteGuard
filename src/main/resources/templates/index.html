@@ -12,8 +12,8 @@
     <h2>AthleteGuard</h2>
     <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">Athletes</a>
     <div class="navbar-right">
-        <span class="navbar-user" sec:authentication="name"></span>
-        <form th:action="@{/logout}" method="post" style="display:inline;">
+        <span class="navbar-user" th:text="${displayName}"></span>
+        <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn-navbar-logout">Logout</button>
         </form>
     </div>
@@ -22,7 +22,7 @@
 <div class="container">
     <div class="card">
         <h1>Welcome to AthleteGuard</h1>
-        <p>Athlete performance tracking and injury risk monitoring system.</p>
+        <p>Click below to see your athletes and view or add training sessions.</p>
         <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">
             <button>View Athletes</button>
         </a>

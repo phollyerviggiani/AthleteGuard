@@ -1,50 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Athletes - AthleteGuard</title>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <title>Athletes - AthleteGuard</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 
 <div class="navbar">
-  <h2>AthleteGuard</h2>
-  <a th:href="@{/}">Home</a>
-  <div class="navbar-right">
-    <span class="navbar-user" sec:authentication="name"></span>
-    <form th:action="@{/logout}" method="post" style="display:inline;">
-      <button type="submit" class="btn-navbar-logout">Logout</button>
-    </form>
-  </div>
+    <h2>AthleteGuard</h2>
+    <a th:href="@{/}">Home</a>
+    <div class="navbar-right">
+        <span class="navbar-user" th:text="${displayName}"></span>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn-navbar-logout">Logout</button>
+        </form>
+    </div>
 </div>
 
 <div class="container">
 
-  <h1>Athletes</h1>
+    <h1>Athletes</h1>
 
-  <div class="card">
-    <table>
-      <thead>
-      <tr>
-        <th>Name</th>
-        <th>Sport</th>
-        <th>Position</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="athlete : ${athletes}">
-        <td>
-          <a th:href="@{/athletes/{id}(id=${athlete.athleteId})}"
-             th:text="${athlete.firstName + ' ' + athlete.lastName}">
-          </a>
-        </td>
-        <td th:text="${athlete.sport}"></td>
-        <td th:text="${athlete.position}"></td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="card">
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Sport</th>
+                <th>Position</th>
+                <th></th> <!-- action column -->
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="athlete : ${athletes}">
+                <!-- Name is now plain text -->
+                <td th:text="${athlete.firstName + ' ' + athlete.lastName}"></td>
+
+                <td th:text="${athlete.sport}"></td>
+                <td th:text="${athlete.position}"></td>
+
+                <!-- View button -->
+                <td>
+                    <a class="btn-secondary"
+                       th:href="@{/athletes/{id}(id=${athlete.athleteId})}">
+                        View
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
 </div>
 

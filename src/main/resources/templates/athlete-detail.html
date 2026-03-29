@@ -12,8 +12,8 @@
     <h2>AthleteGuard</h2>
     <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">Athletes</a>
     <div class="navbar-right">
-        <span class="navbar-user" sec:authentication="name"></span>
-        <form th:action="@{/logout}" method="post" style="display:inline;">
+        <span class="navbar-user" th:text="${displayName}"></span>
+        <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn-navbar-logout">Logout</button>
         </form>
     </div>
@@ -35,7 +35,7 @@
             View Training Sessions
         </a>
     </div>
-
+    <br>
     <div class="card">
         <p><strong>Sport:</strong> <span th:text="${athlete.sport}"></span></p>
         <p><strong>Position:</strong> <span th:text="${athlete.position}"></span></p>
@@ -65,6 +65,14 @@
         <div th:if="${risk == null}">
             <p>No risk flags generated yet.</p>
         </div>
+    </div>
+
+    <div class="actions">
+        <a class="btn-secondary"
+           sec:authorize="hasRole('COACH')"
+           th:href="@{/athletes}">
+            Back to Athletes
+        </a>
     </div>
 
 </div>

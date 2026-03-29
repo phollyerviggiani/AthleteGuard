@@ -10,10 +10,10 @@
 
 <div class="navbar">
     <h2>AthleteGuard</h2>
-    <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">All Athletes</a>
+    <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">Athletes</a>
     <div class="navbar-right">
-        <span class="navbar-user" sec:authentication="name"></span>
-        <form th:action="@{/logout}" method="post" style="display:inline;">
+        <span class="navbar-user" th:text="${displayName}"></span>
+        <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn-navbar-logout">Logout</button>
         </form>
     </div>

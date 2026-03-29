@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Oops! Error</title>
   <link rel="stylesheet" th:href="@{/css/styles.css}">
@@ -10,8 +9,8 @@
 <div class="navbar">
   <h2>AthleteGuard</h2>
   <div class="navbar-right">
-    <span class="navbar-user" sec:authentication="name"></span>
-    <form th:action="@{/logout}" method="post" style="display:inline;">
+    <span class="navbar-user" th:text="${displayName}"></span>
+    <form th:action="@{/logout}" method="post">
       <button type="submit" class="btn-navbar-logout">Logout</button>
     </form>
   </div>
