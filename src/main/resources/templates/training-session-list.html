@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Training Sessions</title>
     <meta charset="UTF-8">
@@ -9,25 +10,29 @@
 
 <div class="navbar">
     <h2>AthleteGuard</h2>
-    <a th:href="@{/athletes}">All Athletes</a>
+    <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">All Athletes</a>
+    <div class="navbar-right">
+        <span class="navbar-user" sec:authentication="name"></span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-navbar-logout">Logout</button>
+        </form>
+    </div>
 </div>
 
 <div class="container">
 
     <div class="card">
-        <h2>
-            Training Sessions –
+        <h2>Training Sessions –
             <span th:text="${athlete.firstName + ' ' + athlete.lastName}"></span>
         </h2>
 
         <div class="actions">
             <a class="btn-primary"
+               sec:authorize="hasRole('COACH')"
                th:href="@{'/athletes/' + ${athlete.athleteId} + '/sessions/new'}">
                 Add Training Session
             </a>
-
-            <a class="btn-secondary"
-               th:href="@{'/athletes/' + ${athlete.athleteId}}">
+            <a class="btn-secondary" th:href="@{'/athletes/' + ${athlete.athleteId}}">
                 Back to Athlete
             </a>
         </div>

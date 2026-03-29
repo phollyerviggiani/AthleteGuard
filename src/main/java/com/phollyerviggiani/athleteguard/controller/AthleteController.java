@@ -1,12 +1,16 @@
 package com.phollyerviggiani.athleteguard.controller;
 
 import com.phollyerviggiani.athleteguard.entity.Athlete;
+import com.phollyerviggiani.athleteguard.entity.Users;
 import com.phollyerviggiani.athleteguard.entity.WorkloadSummary;
 import com.phollyerviggiani.athleteguard.entity.InjuryRiskFlag;
 import com.phollyerviggiani.athleteguard.repository.WorkloadSummaryRepository;
 import com.phollyerviggiani.athleteguard.repository.InjuryRiskFlagRepository;
+import com.phollyerviggiani.athleteguard.security.CustomUserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
 import java.util.Optional;
 import com.phollyerviggiani.athleteguard.service.AthleteService;
 import org.springframework.stereotype.Controller;
@@ -33,17 +37,39 @@ public class AthleteController {
 
     // going to /athletes which shows all athletes
     @GetMapping("/athletes")
-    public String getAllAthletes(Model model) {
+    public String getAllAthletes(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                 Model model) {
 
-        model.addAttribute("athletes", athleteService.getAllAthletes());
+        Users user = userDetails.getUser();
 
+        // if the user is an athlete, redirect them to their own athlete page instead of showing all athletes
+        if (user.getRole().equals("ATHLETE")) {
+            return "redirect:/athletes/" + user.getAthlete().getAthleteId();
+        }
+
+        List<Athlete> athletes = athleteService.getAllAthletes();
+        model.addAttribute("athletes", athletes);
+
+        // coach can proceed as normal
         return "athletes";
     }
 
 
     // going to specific athlete page, showing all athlete details
     @GetMapping("/athletes/{id}")
-    public String getAthleteDetail(@PathVariable Integer id, Model model) {
+    public String getAthleteDetail(@PathVariable Integer id,
+                                   @AuthenticationPrincipal CustomUserDetails userDetails,
+                                   Model model) {
+
+        Users user = userDetails.getUser();
+
+        if (user.getRole().equals("ATHLETE")) {
+            Integer userAthleteId = user.getAthlete().getAthleteId();
+
+            if (!userAthleteId.equals(id)) {
+                return "redirect:/athletes/" + userAthleteId;
+            }
+        }
 
         Optional<Athlete> athleteOpt = athleteService.getAthleteById(id);
 
@@ -67,6 +93,4 @@ public class AthleteController {
 
         return "athlete-detail";
     }
-
-
 }

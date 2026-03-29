@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <title>Athletes - AthleteGuard</title>
   <meta charset="UTF-8">
@@ -10,6 +11,12 @@
 <div class="navbar">
   <h2>AthleteGuard</h2>
   <a th:href="@{/}">Home</a>
+  <div class="navbar-right">
+    <span class="navbar-user" sec:authentication="name"></span>
+    <form th:action="@{/logout}" method="post" style="display:inline;">
+      <button type="submit" class="btn-navbar-logout">Logout</button>
+    </form>
+  </div>
 </div>
 
 <div class="container">

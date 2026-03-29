@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Athlete Details</title>
     <meta charset="UTF-8">
@@ -9,7 +10,13 @@
 
 <div class="navbar">
     <h2>AthleteGuard</h2>
-    <a th:href="@{/athletes}">Athletes</a>
+    <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">Athletes</a>
+    <div class="navbar-right">
+        <span class="navbar-user" sec:authentication="name"></span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-navbar-logout">Logout</button>
+        </form>
+    </div>
 </div>
 
 <div class="container">
@@ -18,6 +25,7 @@
 
     <div class="actions">
         <a class="btn-primary"
+           sec:authorize="hasRole('COACH')"
            th:href="@{'/athletes/' + ${athlete.athleteId} + '/sessions/new'}">
             Add Training Session
         </a>
@@ -35,31 +43,25 @@
 
     <div class="card">
         <h3>Latest Workload Summary</h3>
-
         <div th:if="${summary == null or summary.periodEndDate.isBefore(T(java.time.LocalDate).now().minusDays(28))}">
             <p>Log at least 3 training sessions in the last 28 days to generate workload metrics.</p>
         </div>
-
         <div th:if="${summary != null and summary.periodEndDate.isAfter(T(java.time.LocalDate).now().minusDays(28))}">
             <p><strong>Acute:</strong> <span th:text="${#numbers.formatDecimal(summary.acuteWorkload, 1, 1)}"></span></p>
             <p><strong>Chronic:</strong> <span th:text="${#numbers.formatDecimal(summary.chronicWorkload, 1, 1)}"></span></p>
             <p><strong>ACWR:</strong> <span th:text="${#numbers.formatDecimal(summary.acwr, 1, 1)}"></span></p>
         </div>
-
     </div>
 
     <div class="card">
         <h3>Current Injury Risk</h3>
-
         <div th:if="${risk != null}">
             <span class="badge"
                   th:classappend="${risk.riskLevel == 'HIGH'} ? ' badge-high' : (${risk.riskLevel == 'MODERATE'} ? ' badge-moderate' : (${risk.riskLevel == 'UNDERLOAD'} ? ' badge-underload' : ' badge-low'))"
                   th:text="${risk.riskLevel}">
             </span>
-
             <p th:text="${risk.reason}"></p>
         </div>
-
         <div th:if="${risk == null}">
             <p>No risk flags generated yet.</p>
         </div>

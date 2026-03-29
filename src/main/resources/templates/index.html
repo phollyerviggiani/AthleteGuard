@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>AthleteGuard</title>
     <meta charset="UTF-8">
@@ -9,16 +10,20 @@
 
 <div class="navbar">
     <h2>AthleteGuard</h2>
-    <a th:href="@{/athletes}">Athletes</a>
+    <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">Athletes</a>
+    <div class="navbar-right">
+        <span class="navbar-user" sec:authentication="name"></span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-navbar-logout">Logout</button>
+        </form>
+    </div>
 </div>
 
 <div class="container">
     <div class="card">
         <h1>Welcome to AthleteGuard</h1>
-        <p>
-            Athlete performance tracking and injury risk monitoring system.
-        </p>
-        <a th:href="@{/athletes}">
+        <p>Athlete performance tracking and injury risk monitoring system.</p>
+        <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">
             <button>View Athletes</button>
         </a>
     </div>

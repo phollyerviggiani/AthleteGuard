@@ -2,6 +2,7 @@ package com.phollyerviggiani.athleteguard.service;
 
 import com.phollyerviggiani.athleteguard.entity.Users;
 import com.phollyerviggiani.athleteguard.repository.UsersRepository;
+import com.phollyerviggiani.athleteguard.security.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,10 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPasswordHash())
-                .roles(user.getRole()) // e.g. "COACH"
-                .build();
+        return new CustomUserDetails(user);
     }
 }

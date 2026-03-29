@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Add Training Session</title>
     <meta charset="UTF-8">
@@ -9,11 +10,16 @@
 
 <div class="navbar">
     <h2>AthleteGuard</h2>
-    <a th:href="@{/athletes}">Athletes</a>
+    <a sec:authorize="hasRole('COACH')" th:href="@{/athletes}">Athletes</a>
+    <div class="navbar-right">
+        <span class="navbar-user" sec:authentication="name"></span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-navbar-logout">Logout</button>
+        </form>
+    </div>
 </div>
 
 <div class="container">
-
     <div class="card">
         <div class="page-title"
              th:text="'Add Training Session for ' + ${athlete.firstName} + ' ' + ${athlete.lastName}">
@@ -23,21 +29,15 @@
               th:object="${trainingSession}"
               method="post">
 
-            <!-- SESSION DATE -->
             <div class="form-group">
                 <label>Session Date</label>
                 <input type="date"
                        th:field="*{sessionDate}"
                        th:classappend="${#fields.hasErrors('sessionDate')} ? ' input-error' : ''"
                        required>
-
-                <div class="error"
-                     th:if="${#fields.hasErrors('sessionDate')}"
-                     th:errors="*{sessionDate}">
-                </div>
+                <div class="error" th:if="${#fields.hasErrors('sessionDate')}" th:errors="*{sessionDate}"></div>
             </div>
 
-            <!-- DURATION -->
             <div class="form-group">
                 <label>Duration (minutes)</label>
                 <input type="number"
@@ -45,14 +45,9 @@
                        min="1" max="300"
                        th:classappend="${#fields.hasErrors('durationMinutes')} ? 'input-error'"
                        required>
-
-                <div class="error"
-                     th:if="${#fields.hasErrors('durationMinutes')}"
-                     th:errors="*{durationMinutes}">
-                </div>
+                <div class="error" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}"></div>
             </div>
 
-            <!-- INTENSITY -->
             <div class="form-group">
                 <label>Intensity (1–10)</label>
                 <input type="number"
@@ -60,52 +55,33 @@
                        min="1" max="10"
                        th:classappend="${#fields.hasErrors('intensity')} ? 'input-error'"
                        required>
-
-                <div class="error"
-                     th:if="${#fields.hasErrors('intensity')}"
-                     th:errors="*{intensity}">
-                </div>
+                <div class="error" th:if="${#fields.hasErrors('intensity')}" th:errors="*{intensity}"></div>
             </div>
 
-            <!-- SESSION TYPE -->
             <div class="form-group">
                 <label>Session Type</label>
                 <input type="text"
                        th:field="*{sessionType}"
                        th:classappend="${#fields.hasErrors('sessionType')} ? 'input-error'"
                        required>
-
-                <div class="error"
-                     th:if="${#fields.hasErrors('sessionType')}"
-                     th:errors="*{sessionType}">
-                </div>
+                <div class="error" th:if="${#fields.hasErrors('sessionType')}" th:errors="*{sessionType}"></div>
             </div>
 
-            <!-- NOTES -->
             <div class="form-group">
                 <label>Notes</label>
                 <textarea th:field="*{notes}"
                           maxlength="500"
                           th:classappend="${#fields.hasErrors('notes')} ? 'input-error'"></textarea>
-
-                <div class="error"
-                     th:if="${#fields.hasErrors('notes')}"
-                     th:errors="*{notes}">
-                </div>
+                <div class="error" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></div>
             </div>
 
             <div class="form-actions">
                 <button type="submit" class="btn-primary">Save Session</button>
-
-                <a th:href="@{'/athletes/' + ${athlete.athleteId}}"
-                   class="btn-secondary">
-                    Cancel
-                </a>
+                <a th:href="@{'/athletes/' + ${athlete.athleteId}}" class="btn-secondary">Cancel</a>
             </div>
 
         </form>
     </div>
-
 </div>
 
 </body>

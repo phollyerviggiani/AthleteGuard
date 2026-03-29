@@ -28,6 +28,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .successHandler(successHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -50,5 +51,10 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    private final CustomLoginSuccessHandler successHandler;
+
+    public SecurityConfig(CustomLoginSuccessHandler successHandler) {
+        this.successHandler = successHandler;
+    }
 
 }

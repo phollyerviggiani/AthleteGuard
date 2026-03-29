@@ -2,8 +2,11 @@ package com.phollyerviggiani.athleteguard.controller;
 
 import com.phollyerviggiani.athleteguard.entity.Athlete;
 import com.phollyerviggiani.athleteguard.entity.TrainingSession;
+import com.phollyerviggiani.athleteguard.entity.Users;
+import com.phollyerviggiani.athleteguard.security.CustomUserDetails;
 import com.phollyerviggiani.athleteguard.service.AthleteService;
 import com.phollyerviggiani.athleteguard.service.TrainingSessionService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +30,19 @@ public class TrainingSessionController {
     }
 
     @GetMapping
-    public String listSessions(@PathVariable Integer athleteId, Model model) {
+    public String listSessions(@PathVariable Integer athleteId,
+                               @AuthenticationPrincipal CustomUserDetails userDetails,
+                               Model model) {
+
+        Users user = userDetails.getUser();
+
+        if (user.getRole().equals("ATHLETE")) {
+            Integer userAthleteId = user.getAthlete().getAthleteId();
+
+            if (!userAthleteId.equals(athleteId)) {
+                return "redirect:/athletes/" + userAthleteId;
+            }
+        }
 
         Athlete athlete = athleteService.getAthleteById(athleteId)
                 .orElseThrow(() -> new RuntimeException("Athlete not found"));
@@ -43,7 +58,15 @@ public class TrainingSessionController {
 
     // Show form
     @GetMapping("/new")
-    public String showSessionForm(@PathVariable Integer athleteId, Model model) {
+    public String showSessionForm(@PathVariable Integer athleteId,
+                                  @AuthenticationPrincipal CustomUserDetails userDetails,
+                                  Model model) {
+
+        Users user = userDetails.getUser();
+
+        if (user.getRole().equals("ATHLETE")) {
+            return "redirect:/athletes/" + user.getAthlete().getAthleteId();
+        }
 
         Optional<Athlete> athleteOpt = athleteService.getAthleteById(athleteId);
 
@@ -58,13 +81,19 @@ public class TrainingSessionController {
     }
 
 
-
     // Handle submission
     @PostMapping
     public String addSession(@PathVariable Integer athleteId,
+                             @AuthenticationPrincipal CustomUserDetails userDetails,
                              @Valid @ModelAttribute TrainingSession trainingSession,
                              BindingResult result,
                              Model model) {
+
+        Users user = userDetails.getUser();
+
+        if (user.getRole().equals("ATHLETE")) {
+            return "redirect:/athletes/" + user.getAthlete().getAthleteId();
+        }
 
         Athlete athlete = athleteService.getAthleteById(athleteId)
                 .orElseThrow(() -> new RuntimeException("Athlete not found"));
