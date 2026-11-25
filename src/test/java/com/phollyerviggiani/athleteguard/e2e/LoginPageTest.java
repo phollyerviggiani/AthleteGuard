@@ -139,7 +139,7 @@ class LoginPageTest {
     }
 
 
-    // valid login time
+    // valid login time athlete
     @Test
     void shouldSuccessfullyLoginAsAthlete() {
 
@@ -161,8 +161,114 @@ class LoginPageTest {
                 "Athlete should be redirected to their own dashboard"
         );
 
-        page.waitForTimeout(3000);
     }
 
+
+    // Verify that an authenticated athlete is redirected away from the login page
+    @Test
+    void shouldRedirectAuthenticatedAthleteAwayFromLoginPage() {
+        page.navigate("http://localhost:8080/login");
+
+        // Log in as an athlete
+        page.locator("input[name='username']")
+                .fill(athleteEmail);
+
+        page.locator("input[name='password']")
+                .fill(athletePassword);
+
+        page.locator("button[type='submit']").click();
+
+        // Store the athlete's dashboard URL
+        String athleteDashboardUrl = page.url();
+
+        assertTrue(
+                athleteDashboardUrl.matches("http://localhost:8080/athletes/\\d+"),
+                "Athlete should initially be redirected to their dashboard"
+        );
+
+        // Attempt to revisit the login page while authenticated
+        page.navigate("http://localhost:8080/login");
+
+        // Verify the athlete is redirected back to their dashboard
+        assertEquals(
+                athleteDashboardUrl,
+                page.url(),
+                "Authenticated athlete should be redirected to their own dashboard"
+        );
+    }
+
+    // valid login time coach
+    @Test
+    void shouldSuccessfullyLoginAsCoach() {
+
+        page.navigate("http://localhost:8080/login");
+
+        page.locator("input[name='username']")
+                .fill(coachEmail);
+
+        page.locator("input[name='password']")
+                .fill(coachPassword);
+
+        page.locator("button[type='submit']").click();
+
+        // make sure auth redirect to dashboard
+        assertTrue(
+                page.url().matches("http://localhost:8080/"),
+                "Coach should be redirected to the home page after successful login"
+        );
+
+    }
+
+    // verify that logout works for athlete and that they cannot access their dashboard after logging out
+    @Test
+    void shouldSuccessfullyLogoutAsAthlete() {
+        page.navigate("http://localhost:8080/login");
+
+        // Log in as an athlete
+        page.locator("input[name='username']")
+                .fill(athleteEmail);
+
+        page.locator("input[name='password']")
+                .fill(athletePassword);
+
+        page.locator("button[type='submit']").click();
+
+        // Store the athlete's dashboard URL
+        String athleteDashboardUrl = page.url();
+
+        assertTrue(
+                athleteDashboardUrl.matches("http://localhost:8080/athletes/\\d+")
+        );
+
+        // Click the logout button in the navbar
+        page.locator(".btn-navbar-logout").click();
+
+        // Verify successful logout redirect
+        assertTrue(
+                page.url().endsWith("/login?logout"),
+                "Athlete should be redirected to the login page after logout"
+        );
+
+        // Verify logout confirmation message
+        Locator successMessage = page.locator(".alert-success");
+
+        assertTrue(successMessage.isVisible());
+
+        assertEquals(
+                "Logged out successfully",
+                successMessage.textContent().trim()
+        );
+
+        // Attempt to revisit the athlete dashboard
+        page.navigate(athleteDashboardUrl);
+
+        // Verify access is denied and the athlete is redirected to login
+        assertTrue(
+                page.url().startsWith("http://localhost:8080/login"),
+                "Logged-out athlete should not be able to access their dashboard"
+        );
+
+        assertTrue(page.locator("input[name='username']").isVisible());
+    }
 
 }
