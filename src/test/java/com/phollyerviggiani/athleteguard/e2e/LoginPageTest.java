@@ -4,6 +4,9 @@ package com.phollyerviggiani.athleteguard.e2e;
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
 
+import java.util.regex.Pattern;
+
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoginPageTest {
@@ -14,10 +17,15 @@ class LoginPageTest {
     private BrowserContext context;
     private Page page;
 
-    private String athleteEmail = System.getenv("TEST_ATHLETE_EMAIL");
-    private String athletePassword = System.getenv("TEST_ATHLETE_PASSWORD");
-    private String coachEmail = System.getenv("TEST_COACH_EMAIL");
-    private String coachPassword = System.getenv("TEST_COACH_PASSWORD");
+    private final String athleteEmail = System.getenv("TEST_ATHLETE_EMAIL");
+    private final String athletePassword = System.getenv("TEST_ATHLETE_PASSWORD");
+    private final String coachEmail = System.getenv("TEST_COACH_EMAIL");
+    private final String coachPassword = System.getenv("TEST_COACH_PASSWORD");
+
+    private static final String BASE_URL = "http://localhost:8080/";
+    private static final String HOME_PATH = "/";
+    private static final String LOGIN_PATH = "/login";
+    private static final Pattern ATHLETE_PATH = Pattern.compile(".*/athletes/\\d+$");
 
     @BeforeAll
     static void setUpBrowser() {
@@ -30,7 +38,9 @@ class LoginPageTest {
 
     @BeforeEach
     void setUpPage() {
-        context = browser.newContext();
+        context = browser.newContext(
+                new Browser.NewContextOptions().setBaseURL(BASE_URL)
+        );
         page = context.newPage();
     }
 
@@ -49,30 +59,30 @@ class LoginPageTest {
     @Test
     void shouldLoadLoginPage() {
 
-        Response response = page.navigate("http://localhost:8080/login");
+        Response response = page.navigate(LOGIN_PATH);
 
         assertNotNull(response);
         assertEquals(200, response.status());
 
-        assertEquals("Login", page.title());
+        assertThat(page).hasTitle("Login");
     }
 
     // just verifying elements are present on the login page
     @Test
     void shouldDisplayLoginFormElements() {
 
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
         // Verify page headings
-        assertTrue(page.locator("h1.login-heading").isVisible());
-        assertTrue(page.locator("h2.login-title").isVisible());
+        assertThat(page.locator("h1.login-heading")).isVisible();
+        assertThat(page.locator("h2.login-title")).isVisible();
 
-        // Verify email and password inputs
-        assertTrue(page.locator("input[name='username']").isVisible());
-        assertTrue(page.locator("input[name='password']").isVisible());
+        // username/pw
+        assertThat(page.locator("input[name='username']")).isVisible();
+        assertThat(page.locator("input[name='password']")).isVisible();
 
-        // Verify login button
-        assertTrue(page.locator("button[type='submit']").isVisible());
+        // button works
+        assertThat(page.locator("button[type='submit']")).isVisible();
     }
 
 
@@ -80,13 +90,10 @@ class LoginPageTest {
     @Test
     void shouldRequireEmailAndPassword() {
 
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
-        Locator emailInput = page.locator("input[name='username']");
-        Locator passwordInput = page.locator("input[name='password']");
-
-        assertTrue(emailInput.getAttribute("required") != null);
-        assertTrue(passwordInput.getAttribute("required") != null);
+        assertThat(page.locator("input[name='username']")).hasAttribute("required", "");
+        assertThat(page.locator("input[name='password']")).hasAttribute("required", "");
     }
 
 
@@ -94,25 +101,23 @@ class LoginPageTest {
     @Test
     void shouldPreventEmptyFormSubmission() {
 
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
         page.locator("button[type='submit']").click();
 
         // Verify the browser remains on the login page
-        assertTrue(page.url().endsWith("/login"));
+        assertThat(page).hasURL(LOGIN_PATH);
 
         // Verify both inputs remain empty
-        assertEquals("", page.locator("input[name='username']").inputValue());
-        assertEquals("", page.locator("input[name='password']").inputValue());
+        assertThat(page.locator("input[name='username']")).hasValue("");
+        assertThat(page.locator("input[name='password']")).hasValue("");
     }
-
-
 
     // reject invalid creds
     @Test
     void shouldDisplayErrorForInvalidCredentials() {
 
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
         // Enter invalid credentials
         page.locator("input[name='username']")
@@ -125,17 +130,13 @@ class LoginPageTest {
         page.locator("button[type='submit']").click();
 
         // Verify redirect to log in error page
-        assertTrue(page.url().contains("/login?error"));
+        assertThat(page).hasURL(LOGIN_PATH + "?error");
 
         // Verify error message
         Locator errorMessage = page.locator(".alert-error");
 
-        assertTrue(errorMessage.isVisible());
-
-        assertEquals(
-                "Invalid email or password",
-                errorMessage.textContent().trim()
-        );
+        assertThat(errorMessage).isVisible();
+        assertThat(errorMessage).hasText("Invalid email or password");
     }
 
 
@@ -143,132 +144,88 @@ class LoginPageTest {
     @Test
     void shouldSuccessfullyLoginAsAthlete() {
 
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
         // Enter valid athlete credentials
-        page.locator("input[name='username']")
-                .fill(athleteEmail);
+        loginAs(athleteEmail, athletePassword);
 
-        page.locator("input[name='password']")
-                .fill(athletePassword);
-
-        // Submit login form
-        page.locator("button[type='submit']").click();
-
-        // Verify successful authentication and athlete dashboard redirect
-        assertTrue(
-                page.url().matches("http://localhost:8080/athletes/\\d+"),
-                "Athlete should be redirected to their own dashboard"
-        );
-
+        assertThat(page).hasURL(ATHLETE_PATH);
     }
 
 
     // Verify that an authenticated athlete is redirected away from the login page
     @Test
     void shouldRedirectAuthenticatedAthleteAwayFromLoginPage() {
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
         // Log in as an athlete
-        page.locator("input[name='username']")
-                .fill(athleteEmail);
+        loginAs(athleteEmail, athletePassword);
 
-        page.locator("input[name='password']")
-                .fill(athletePassword);
-
-        page.locator("button[type='submit']").click();
+        assertThat(page).hasURL(ATHLETE_PATH);
 
         // Store the athlete's dashboard URL
         String athleteDashboardUrl = page.url();
 
-        assertTrue(
-                athleteDashboardUrl.matches("http://localhost:8080/athletes/\\d+"),
-                "Athlete should initially be redirected to their dashboard"
-        );
-
         // Attempt to revisit the login page while authenticated
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
         // Verify the athlete is redirected back to their dashboard
-        assertEquals(
-                athleteDashboardUrl,
-                page.url(),
-                "Authenticated athlete should be redirected to their own dashboard"
-        );
+        assertThat(page).hasURL(athleteDashboardUrl);
+
     }
 
     // valid login time coach
     @Test
     void shouldSuccessfullyLoginAsCoach() {
 
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
-        page.locator("input[name='username']")
-                .fill(coachEmail);
-
-        page.locator("input[name='password']")
-                .fill(coachPassword);
-
-        page.locator("button[type='submit']").click();
+        loginAs(coachEmail, coachPassword);
 
         // make sure auth redirect to dashboard
-        assertTrue(
-                page.url().matches("http://localhost:8080/"),
-                "Coach should be redirected to the home page after successful login"
-        );
+        assertThat(page).hasURL(HOME_PATH);
 
     }
 
     // verify that logout works for athlete and that they cannot access their dashboard after logging out
     @Test
     void shouldSuccessfullyLogoutAsAthlete() {
-        page.navigate("http://localhost:8080/login");
+        page.navigate(LOGIN_PATH);
 
         // Log in as an athlete
-        page.locator("input[name='username']")
-                .fill(athleteEmail);
+        loginAs(athleteEmail, athletePassword);
 
-        page.locator("input[name='password']")
-                .fill(athletePassword);
-
-        page.locator("button[type='submit']").click();
+        assertThat(page).hasURL(ATHLETE_PATH);
 
         // Store the athlete's dashboard URL
         String athleteDashboardUrl = page.url();
-
-        assertTrue(
-                athleteDashboardUrl.matches("http://localhost:8080/athletes/\\d+")
-        );
 
         // Click the logout button in the navbar
         page.locator(".btn-navbar-logout").click();
 
         // Verify successful logout redirect
-        assertTrue(
-                page.url().endsWith("/login?logout"),
-                "Athlete should be redirected to the login page after logout"
-        );
+        assertThat(page).hasURL(LOGIN_PATH + "?logout");
 
         // Verify logout confirmation message
         Locator successMessage = page.locator(".alert-success");
 
-        assertTrue(successMessage.isVisible());
-
-        assertEquals(
-                "Logged out successfully",
-                successMessage.textContent().trim()
-        );
+        assertThat(successMessage).isVisible();
+        assertThat(successMessage).hasText("Logged out successfully");
 
         // Attempt to revisit the athlete dashboard
         page.navigate(athleteDashboardUrl);
 
-        // Verify access is denied and the athlete is redirected to login
-        assertTrue(
-                page.url().startsWith("http://localhost:8080/login"),
-                "Logged-out athlete should not be able to access their dashboard"
-        );
+        // Verify access is denied and the athlete is redirected to log in
+        assertThat(page).hasURL(LOGIN_PATH );
+        assertThat(page.locator("input[name='username']")).isVisible();
+    }
 
-        assertTrue(page.locator("input[name='username']").isVisible());
+    // login helper method
+    private void loginAs(String email, String password) {
+        page.navigate(LOGIN_PATH);
+        page.locator("input[name='username']").fill(email);
+        page.locator("input[name='password']").fill(password);
+        page.locator("button[type='submit']").click();
     }
 
 }
