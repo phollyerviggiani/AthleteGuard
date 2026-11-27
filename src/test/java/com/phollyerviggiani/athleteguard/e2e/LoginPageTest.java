@@ -3,6 +3,7 @@ package com.phollyerviggiani.athleteguard.e2e;
 
 import com.microsoft.playwright.*;
 import org.junit.jupiter.api.*;
+import com.phollyerviggiani.athleteguard.pages.LoginPage;
 
 import java.util.regex.Pattern;
 
@@ -16,6 +17,8 @@ class LoginPageTest {
 
     private BrowserContext context;
     private Page page;
+
+    private LoginPage loginPage;
 
     private final String athleteEmail = System.getenv("TEST_ATHLETE_EMAIL");
     private final String athletePassword = System.getenv("TEST_ATHLETE_PASSWORD");
@@ -42,6 +45,7 @@ class LoginPageTest {
                 new Browser.NewContextOptions().setBaseURL(BASE_URL)
         );
         page = context.newPage();
+        loginPage = new LoginPage(page);
     }
 
     @AfterEach
@@ -55,7 +59,7 @@ class LoginPageTest {
         playwright.close();
     }
 
-    // does it load
+    // Checking if the page loads correctly and has the expected title
     @Test
     void shouldLoadLoginPage() {
 
@@ -67,22 +71,12 @@ class LoginPageTest {
         assertThat(page).hasTitle("Login");
     }
 
-    // just verifying elements are present on the login page
+    // Verifying elements are present on the login page
     @Test
     void shouldDisplayLoginFormElements() {
 
         page.navigate(LOGIN_PATH);
-
-        // Verify page headings
-        assertThat(page.locator("h1.login-heading")).isVisible();
-        assertThat(page.locator("h2.login-title")).isVisible();
-
-        // username/pw
-        assertThat(page.locator("input[name='username']")).isVisible();
-        assertThat(page.locator("input[name='password']")).isVisible();
-
-        // button works
-        assertThat(page.locator("button[type='submit']")).isVisible();
+        loginPage.verifyLoginFormElements();
     }
 
 
@@ -91,9 +85,7 @@ class LoginPageTest {
     void shouldRequireEmailAndPassword() {
 
         page.navigate(LOGIN_PATH);
-
-        assertThat(page.locator("input[name='username']")).hasAttribute("required", "");
-        assertThat(page.locator("input[name='password']")).hasAttribute("required", "");
+        loginPage.verifyLoginFormElementsAreRequired();
     }
 
 
@@ -102,15 +94,11 @@ class LoginPageTest {
     void shouldPreventEmptyFormSubmission() {
 
         page.navigate(LOGIN_PATH);
+        loginPage.clickLogin();
 
-        page.locator("button[type='submit']").click();
-
-        // Verify the browser remains on the login page
+        // Verify that the page remains on the login page and the inputs are still empty
         assertThat(page).hasURL(LOGIN_PATH);
-
-        // Verify both inputs remain empty
-        assertThat(page.locator("input[name='username']")).hasValue("");
-        assertThat(page.locator("input[name='password']")).hasValue("");
+        loginPage.verifyLoginFieldsAreEmpty();
     }
 
     // reject invalid creds
@@ -118,16 +106,7 @@ class LoginPageTest {
     void shouldDisplayErrorForInvalidCredentials() {
 
         page.navigate(LOGIN_PATH);
-
-        // Enter invalid credentials
-        page.locator("input[name='username']")
-                .fill("invalid@example.com");
-
-        page.locator("input[name='password']")
-                .fill("WrongPassword123");
-
-        // Submit login form
-        page.locator("button[type='submit']").click();
+        loginPage.invalidLogin();
 
         // Verify redirect to log in error page
         assertThat(page).hasURL(LOGIN_PATH + "?error");
@@ -144,10 +123,9 @@ class LoginPageTest {
     @Test
     void shouldSuccessfullyLoginAsAthlete() {
 
+        // Navigate to the login page, enter valid athlete credentials, and submit the form
         page.navigate(LOGIN_PATH);
-
-        // Enter valid athlete credentials
-        loginAs(athleteEmail, athletePassword);
+        loginPage.loginAs(athleteEmail, athletePassword);
 
         assertThat(page).hasURL(ATHLETE_PATH);
     }
@@ -157,16 +135,12 @@ class LoginPageTest {
     @Test
     void shouldRedirectAuthenticatedAthleteAwayFromLoginPage() {
         page.navigate(LOGIN_PATH);
-
-        // Log in as an athlete
-        loginAs(athleteEmail, athletePassword);
+        loginPage.loginAs(athleteEmail, athletePassword);
 
         assertThat(page).hasURL(ATHLETE_PATH);
 
         // Store the athlete's dashboard URL
         String athleteDashboardUrl = page.url();
-
-        // Attempt to revisit the login page while authenticated
         page.navigate(LOGIN_PATH);
 
         // Verify the athlete is redirected back to their dashboard
@@ -179,8 +153,7 @@ class LoginPageTest {
     void shouldSuccessfullyLoginAsCoach() {
 
         page.navigate(LOGIN_PATH);
-
-        loginAs(coachEmail, coachPassword);
+        loginPage.loginAs(coachEmail, coachPassword);
 
         // make sure auth redirect to dashboard
         assertThat(page).hasURL(HOME_PATH);
@@ -191,9 +164,7 @@ class LoginPageTest {
     @Test
     void shouldSuccessfullyLogoutAsAthlete() {
         page.navigate(LOGIN_PATH);
-
-        // Log in as an athlete
-        loginAs(athleteEmail, athletePassword);
+        loginPage.loginAs(athleteEmail, athletePassword);
 
         assertThat(page).hasURL(ATHLETE_PATH);
 
@@ -201,7 +172,7 @@ class LoginPageTest {
         String athleteDashboardUrl = page.url();
 
         // Click the logout button in the navbar
-        page.locator(".btn-navbar-logout").click();
+        loginPage.clickLogout();
 
         // Verify successful logout redirect
         assertThat(page).hasURL(LOGIN_PATH + "?logout");
@@ -220,12 +191,5 @@ class LoginPageTest {
         assertThat(page.locator("input[name='username']")).isVisible();
     }
 
-    // login helper method
-    private void loginAs(String email, String password) {
-        page.navigate(LOGIN_PATH);
-        page.locator("input[name='username']").fill(email);
-        page.locator("input[name='password']").fill(password);
-        page.locator("button[type='submit']").click();
-    }
-
+    // ***** login helper method is now moved to the LoginPage class, so we can remove it from here *****
 }
